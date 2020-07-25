@@ -77,9 +77,9 @@ class Okno extends JFrame {
     private ActionListener akc_zap_kli = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-        	
+
             String pesel = pole_pesel.getText();
-            if ( pesel.matches("[0-9]{3,11}")== false || pesel.length() != 11) {
+            if ( !pesel.matches("[0-9]{3,11}") || pesel.length() != 11) {
                 JOptionPane.showMessageDialog(Okno.this, "błąd w polu z peselem");
                 pole_pesel.setText("");
                 pole_pesel.requestFocus();
@@ -100,7 +100,7 @@ class Okno extends JFrame {
                 return;
             }
             String ur = pole_ur.getText(); 
-            if ( ur.matches("([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))") == false) {
+            if (!ur.matches("([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))")) {
                 JOptionPane.showMessageDialog(Okno.this, "błąd w polu data urodzenia - wpisz w foramcie yyyy-mm-dd");
                 pole_ur.setText("");
                 pole_ur.requestFocus();
@@ -113,7 +113,7 @@ class Okno extends JFrame {
             }
             String mail = pole_mail.getText();
             
-            if ( mail.matches("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$") == false) {
+            if (!mail.matches("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")) {
             	JOptionPane.showMessageDialog(Okno.this, "błąd w polu mail");
                 pole_mail.setText("");
                 pole_mail.requestFocus();
@@ -121,7 +121,7 @@ class Okno extends JFrame {
             }
             String adr = pole_adr.getText();
             String tel = pole_tel.getText();
-            if ( tel.matches("(?:(?:(?:\\+|00)?48)|(?:\\(\\+?48\\)))?(?:1[2-8]|2[2-69]|3[2-49]|4[1-68]|5[0-9]|6[0-35-9]|[7-8][1-9]|9[145])\\d{7}") == false) {
+            if (!tel.matches("(?:(?:(?:\\+|00)?48)|(?:\\(\\+?48\\)))?(?:1[2-8]|2[2-69]|3[2-49]|4[1-68]|5[0-9]|6[0-35-9]|[7-8][1-9]|9[145])\\d{7}")) {
             	JOptionPane.showMessageDialog(Okno.this, "błąd w polu telefon");
                 pole_tel.setText("");
                 pole_tel.requestFocus();
