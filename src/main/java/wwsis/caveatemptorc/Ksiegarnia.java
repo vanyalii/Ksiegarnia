@@ -7,16 +7,15 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.sql.*;
 
+
 class Okno extends JFrame {
-    String newline = System.lineSeparator();
+    JdbcConnect jdbcconnect = new JdbcConnect();
     String[] typyStatus = {"oczekuje", "wyslane", "zaplacone"};
     String[] typyKsiazki = {"sensacja", "kryminał", "fantastyka", "thriller", "horror", "obyczajowa", "poradnik", "biografia", "historyczna", "podróże", "romans", "popularnonaukowa", "młodzieżowa", "dziecięca", "reportaż", "podręcznik"};
     // dane do nawiązania komunikacji z bazą danych
     private PreparedStatement p_1;
-    private String jdbcUrl = "jdbc:mysql://localhost:3301/ksiegarnia?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC", jdbcUser = "root", jdbcPass = "";
     // pole na komunikaty od aplikacji
     private JTextField komunikat = new JTextField();
-    private JTextField komunikatksiazki = new JTextField();
     // panel z zakładkami
     private JTabbedPane tp = new JTabbedPane();
     private JPanel p_kli = new JPanel(); // klienci
@@ -58,7 +57,7 @@ class Okno extends JFrame {
     private JScrollPane sp_zam = new JScrollPane(l_zam);
     // funkcja aktualizująca listę klientów
     private void AktualnaListaKlientów(JList<String> lis) {
-        try (Connection conn=DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcPass)) {
+        try (Connection conn=DriverManager.getConnection(jdbcconnect.jdbcUrl, jdbcconnect.jdbcUser, jdbcconnect.jdbcPass)) {
             Statement stmt = conn.createStatement();
             String sql = "SELECT klienci.pesel, nazwisko, imie, adres FROM klienci, kontakty WHERE klienci.pesel = kontakty.pesel ORDER BY nazwisko, imie";
             ResultSet res = stmt.executeQuery(sql);
@@ -131,7 +130,7 @@ class Okno extends JFrame {
                 JOptionPane.showMessageDialog(Okno.this, "nie wypełnione pole z emailem lub adresem");
                 return;
             }
-            try (Connection conn=DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcPass)) {
+            try (Connection conn=DriverManager.getConnection(jdbcconnect.jdbcUrl, jdbcconnect.jdbcUser, jdbcconnect.jdbcPass)) {
                 Statement stmt = conn.createStatement();
                 String sql1 = "INSERT INTO klienci (pesel, imie, nazwisko, ur) VALUES('" + pesel + "', '" + imie + "', '" + nazwisko + "', '" + ur + "')";
                 int res = stmt.executeUpdate(sql1);
@@ -160,7 +159,7 @@ class Okno extends JFrame {
             if (l_kli.getSelectionModel().getSelectedItemsCount() == 0) return;
             String p = l_kli.getModel().getElementAt(l_kli.getSelectionModel().getMinSelectionIndex());
             p = p.substring(0, p.indexOf(':'));
-            try (Connection conn=DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcPass)) {
+            try (Connection conn=DriverManager.getConnection(jdbcconnect.jdbcUrl, jdbcconnect.jdbcUser, jdbcconnect.jdbcPass)) {
                 Statement stmt = conn.createStatement();
                 String sql = "SELECT COUNT(*) FROM zamowienia WHERE pesel = '" + p + "'";
                 ResultSet res = stmt.executeQuery(sql);
@@ -187,7 +186,7 @@ class Okno extends JFrame {
     };
 
     private void AktualnaListaKsiazek(JList<String> lis) {
-        try (Connection conn=DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcPass)) {
+        try (Connection conn=DriverManager.getConnection(jdbcconnect.jdbcUrl, jdbcconnect.jdbcUser, jdbcconnect.jdbcPass)) {
             Statement stmt = conn.createStatement();
             String sql = "SELECT * FROM ksiazki";
             ResultSet res = stmt.executeQuery(sql);
@@ -225,7 +224,7 @@ class Okno extends JFrame {
                 JOptionPane.showMessageDialog(Okno.this, "nie wypełnione pole z rokiem lub wydawnictwem");
                 return;
             }
-            try (Connection conn=DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcPass)) {
+            try (Connection conn=DriverManager.getConnection(jdbcconnect.jdbcUrl, jdbcconnect.jdbcUser, jdbcconnect.jdbcPass)) {
                 Statement stmt = conn.createStatement();
                 String sql1 = "INSERT INTO ksiazki (isbn, autor, tytul, typ, wydawnictwo, rok, cena) VALUES('"+ pole_isbn.getText() + "', '" + pole_autor.getText() + "', '" + pole_tytul.getText() + "', '" + lista_typ.getSelectedItem() + "', '" + pole_wydawnictwo.getText()  + "', '" + pole_rok.getText() + "', '" + pole_cena.getText() + "')";
                 int res = stmt.executeUpdate(sql1);
@@ -248,7 +247,7 @@ class Okno extends JFrame {
             if (l_ksi.getSelectionModel().getSelectedItemsCount() == 0) return;
             String p = l_ksi.getModel().getElementAt(l_ksi.getSelectionModel().getMinSelectionIndex());
             p = p.substring(0, p.indexOf(':'));
-            try (Connection conn=DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcPass)) {
+            try (Connection conn=DriverManager.getConnection(jdbcconnect.jdbcUrl, jdbcconnect.jdbcUser, jdbcconnect.jdbcPass)) {
                 Statement stmt = conn.createStatement();
 
                     String sql1 = "DELETE FROM ksiazki WHERE isbn = '" + p + "'";
@@ -268,7 +267,7 @@ class Okno extends JFrame {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
 
-            try (Connection conn=DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcPass)) {
+            try (Connection conn=DriverManager.getConnection(jdbcconnect.jdbcUrl, jdbcconnect.jdbcUser, jdbcconnect.jdbcPass)) {
                 String isbn = pole_isbn.getText();
                 String cena = pole_cena.getText();
                 if (isbn.equals("") || cena.equals("") ){
@@ -296,7 +295,7 @@ class Okno extends JFrame {
 
         //delegat osblugujacy zdarzenie pobrania ksiazek z bazy do Jcombobox
         private void PobierzListeKsiazekDoJcomboBox() throws SQLException {
-            try (Connection conn=DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcPass)) {
+            try (Connection conn=DriverManager.getConnection(jdbcconnect.jdbcUrl, jdbcconnect.jdbcUser, jdbcconnect.jdbcPass)) {
                 String sql = "SELECT * FROM ksiazki";
                 Statement prstm = conn.prepareStatement(sql);
                 ResultSet res = prstm.executeQuery(sql);
@@ -312,7 +311,7 @@ class Okno extends JFrame {
         }
     //delegat osblugujacy zdarzenie pobrania ksiazek z bazy do Jcombobox
     private void PobierzListeKlientowDoJcomboBox() throws SQLException {
-        try (Connection conn=DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcPass)) {
+        try (Connection conn=DriverManager.getConnection(jdbcconnect.jdbcUrl, jdbcconnect.jdbcUser, jdbcconnect.jdbcPass)) {
             String sql = "SELECT * FROM klienci";
             Statement prstm = conn.prepareStatement(sql);
             ResultSet res = prstm.executeQuery(sql);
@@ -327,7 +326,7 @@ class Okno extends JFrame {
 
     }
     private void AktualnaListaZamowien(JList<String> lis) {
-        try (Connection conn=DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcPass)) {
+        try (Connection conn=DriverManager.getConnection(jdbcconnect.jdbcUrl, jdbcconnect.jdbcUser, jdbcconnect.jdbcPass)) {
             Statement stmt = conn.createStatement();
             String sql = "SELECT * FROM zamowienia";
             ResultSet res = stmt.executeQuery(sql);
@@ -356,7 +355,7 @@ class Okno extends JFrame {
         }
 
         public void addNewOrderToDB() throws SQLException {
-                try (Connection conn = DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcPass)) {
+                try (Connection conn = DriverManager.getConnection(jdbcconnect.jdbcUrl, jdbcconnect.jdbcUser, jdbcconnect.jdbcPass)) {
                     String sql = "INSERT INTO zamowienia(pesel,ksiazka,kiedy,status) VALUES (?,?,?,?)";
 
                 try {
@@ -371,7 +370,7 @@ class Okno extends JFrame {
                     p_1.setString(4, status);
                     p_1.executeUpdate();
                     AktualnaListaZamowien(l_zam);
-                    System.out.println("Ok - nowe zamówienie dodano");
+                    komunikat.setText("OK - dodano nowe zamówienie");
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
